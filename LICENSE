@@ -22,9 +22,8 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 
-theme.css 中的文件列表样式改编自 Phycat（https://github.com/sumruler/obsidian-theme-phycat），
-其许可如下：
-The file explorer styles in theme.css are adapted from Phycat, licensed as follows:
+The file explorer styles in theme.css are adapted from Phycat
+(https://github.com/sumruler/obsidian-theme-phycat), licensed as follows:
 
 MIT License
 
@@ -50,8 +49,8 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 
-theme.css 中文件列表的图标来自 Lucide（https://lucide.dev），其许可如下：
-The file explorer icons in theme.css are from Lucide, licensed as follows:
+The file explorer icons in theme.css are from Lucide (https://lucide.dev),
+licensed as follows:
 
 ISC License
 
