@@ -1,90 +1,45 @@
-This is a sample theme for Obsidian ([https://obsidian.md](https://obsidian.md/)).
+# Hidontknow
 
-## First time creating a theme?
+一款简洁的 Obsidian 主题，支持亮色 / 暗色。设计参考了 [Phycat](https://github.com/sumruler/obsidian-theme-phycat) 的标题装饰和 [Blue Topaz](https://github.com/whyt-byte/Blue-Topaz_Obsidian-css) 的配色与组件风格，文件列表样式改编自 Phycat（MIT），其余为原创实现。
 
-### Quick start
+## 特性
 
-<img width="244" alt="Pasted image 20220822135601" src="https://user-images.githubusercontent.com/693981/186000386-4f4da987-fcaf-4aa5-aed4-e34b5901255d.png">
+- **标题**：H1 居中，带渐变下划线（悬停变长）；H2 渐变胶囊；H3 左侧色条；H4 强调色。阅读模式和编辑模式外观一致，长标题换行后仍是完整的胶囊，编辑时点击定位准确。
+- **段落间距**：阅读模式按编辑模式的空行排版，块与块之间隔一个空行的高度，两种模式切换时内容基本不跳动。
+- **正文**：粗体为强调色，引用块有浅色背景，行内代码为强调色，代码块左侧带色条，表格圆角并隔行变色，分割线为渐变。
+- **文件列表**：沿用 Phycat 样式，圆角标题行、彩虹文件夹（顶层文件夹按 7 色轮换）、文件夹/文件/图片/Canvas/Base 图标、细层级线。
+- **其他**：标签做成胶囊样式，外链不显示末尾箭头图标，Callout 左侧带色条，已完成的任务文字变淡。
+- 尊重系统的「减少动态效果」设置。
 
-First, select **Use this template** to create a copy of this repository under your GitHub profile. Then, clone your new repository to your computer.
+## 安装
 
-Once you have the repository locally on your computer, there are a couple of placeholder fields you'll need to fill in.
+1. 在库的 `.obsidian/themes/` 下新建文件夹 `Hidontknow`。
+2. 把 `theme.css` 和 `manifest.json` 复制进去（开发时可以用软链接）。
+3. 打开 **设置 → 外观 → 主题**，选择 **Hidontknow**。
 
-1. Inside the `manifest.json` file, update the placeholder fields to describe your theme. For example:
+## 改色
 
-  ```json
-  {
-    "name": "Moonstone",
-    "author": "Your Name",
-    "version": "0.0.0",
-    "minAppVersion": "1.10.6"
-  }
-  ```
+强调色由 `--accent-h/s/l` 推导，主题为亮色和暗色分别设了默认值。想换颜色，可以新建一个 CSS 片段：
 
-   - **name** is the name of your theme.
-   - **author** is your name.
-   - **version** is the version of your theme.
-   - **minAppVersion** should only be changed as you add new CSS from Obsidian updates.
-
-After you have those fields configured, all that's left to do is add your styles! All of your CSS needs to be inside the file `theme.css` as a part of your [release](#releasing-versions).
-
-For a deeper walkthrough, see the official [Build a theme](https://docs.obsidian.md/Themes/App+themes/Build+a+theme) tutorial.
-
-## Preparing your theme for the community directory
-
-Before you can submit your theme to the [community directory](https://community.obsidian.md/), there are a few things you'll need to prepare.
-
-Review the [Theme guidelines](https://docs.obsidian.md/Themes/App+themes/Theme+guidelines) for best practices, such as using CSS variables, avoiding `!important`, and keeping assets local. Themes that don't follow them are more likely to break on future Obsidian versions or get flagged during review.
-
-This template already includes [`stylelint-config-obsidianmd`](https://github.com/obsidianmd/stylelint-config), which enforces the same CSS rules used during theme review. Run `npm install` once, then `npm run lint` to check `theme.css` against them. This also runs automatically on every pull request via the [lint workflow](.github/workflows/lint.yml).
-
-### Add a screenshot thumbnail
-
-Inside the repository, include a screenshot thumbnail of your theme. We recommend storing it in a `screenshots` folder at the root of your repository, for example `screenshots/screenshot.png`. This image will be used for the small preview in the theme list.
-
-Your screenshot file should be `16:9` aspect ratio.
-The recommended size is 512x288.
-
-### Releasing versions
-
-Themes support [GitHub Releases](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository), introduced in v0.16 of Obsidian. This lets you specify which versions of your theme are compatible with which versions of Obsidian.
-
-This repository already includes a [GitHub Actions workflow](.github/workflows/release.yml) that automates this. Pushing a tag matching your `manifest.json` version creates a draft release with `manifest.json` and `theme.css` attached, which you can then review and publish. See [Release your theme with GitHub Actions](https://docs.obsidian.md/Themes/App+themes/Release+your+theme+with+GitHub+Actions) for the full walkthrough.
-
-Before you push a tag, make sure `versions.json` is up to date. This file maps your theme's version to the minimum Obsidian version it's compatible with:
-
-```json
-{
-  "1.0.0": "1.10.6"
-}
+```css
+.theme-light { --accent-h: 340; --accent-s: 75%; --accent-l: 55%; }
+.theme-dark  { --accent-h: 340; --accent-s: 70%; --accent-l: 65%; }
 ```
 
-For the initial release of your theme, you shouldn't need to make any changes to this file. When you release a new version, add an entry for it:
+暗色下 H2 胶囊用深色文字，所以暗色的 `--accent-l` 建议保持在 60% 以上。
 
-```json
-{
-  "1.0.0": "1.10.6",
-  "1.0.1": "1.10.6"
-}
+## 配套插件：Pele Mermaid（试验）
+
+插件 [Pele Mermaid](https://github.com/hidontknow/obsidian-pele-mermaid) 用 [Pele](https://github.com/obsidianmd/pele) 代替内置的 mermaid.js 渲染 Mermaid 图。主题已为 Pele 的图适配亮色 / 暗色配色；不装插件时，Mermaid 图照常由 mermaid.js 渲染。
+
+## 开发
+
+```bash
+npm install
+npm run lint
 ```
 
-The "key" is your theme's version, and the "value" is the minimum version of Obsidian that version is compatible with. If a new version of your theme only works with an Insider build of Obsidian, set this value accordingly, so users on older versions of Obsidian won't be prompted to update to a version that won't work for them.
+## 致谢
 
-## Submit your theme for review
-
-To have your theme included in the Theme Gallery, you'll submit it through the Obsidian Community directory. Make sure you've [added a screenshot](#add-a-screenshot-thumbnail) and [published a release](#releasing-versions) first, since the submission form needs both.
-
-You'll also need a `LICENSE` file in the root of your repository, which isn't included in this template. See [Choose a License](https://choosealicense.com/) if you're not sure which one to use. See the official [Submit your theme](https://docs.obsidian.md/Themes/App+themes/Submit+your+theme) guide for more detail.
-
-1. Go to [community.obsidian.md](https://community.obsidian.md) and sign in with your Obsidian account.
-2. Link your GitHub account to your profile. This lets the directory verify that you own the repository you're submitting.
-3. In the sidebar, select **Themes**, then select **New theme**.
-4. Fill out the submission form:
-   - **GitHub repository URL** is your repository's URL, for example `https://github.com/your-username/your-repo-name`.
-   - **Owner** is who will own and maintain this entry, and doesn't have to match the repository's GitHub owner.
-   - **Screenshot path** is the path to your screenshot, relative to the repository root, for example `screenshots/screenshot.png`.
-   - For **Supported modes**, select Dark and/or Light depending on which your theme supports.
-5. Read and agree to the [Developer Policies](https://docs.obsidian.md/Developer+policies), and confirm that you'll continue to support your theme (or remove/transfer it if you can no longer provide support).
-6. Select **Submit**.
-
-The directory processes the `manifest.json` at the HEAD of your repository's default branch, so make sure it's accurate and committed before submitting. Obsidian downloads `manifest.json` and `theme.css` from the GitHub release whose tag matches the version in your manifest, which is why a published release is required.
+- [Blue Topaz](https://github.com/whyt-byte/Blue-Topaz_Obsidian-css)，MIT，© whyt-byte
+- [Phycat](https://github.com/sumruler/obsidian-theme-phycat)，MIT，© XuJilong

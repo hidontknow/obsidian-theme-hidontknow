@@ -1,34 +1,772 @@
+/*
+ * Hidontknow - Obsidian theme
+ * 灵感来自 Phycat（标题装饰）与 Blue Topaz（配色与组件），文件列表改编自 Phycat，其余为原创实现。
+ * 所有强调色由 --accent-h/s/l 推导；改色可用 CSS 片段覆盖 .theme-light / .theme-dark 下的这三个变量。
+ */
+
+/* ========== 基础变量 ========== */
 body {
-	--radius-s: 0px;
-	--radius-m: 0px;
-	--radius-l: 0px;
-	--input-radius: 0px;
-	--tab-radius-active: 0px;
-	--checkbox-radius: 0px;
-	--toggle-radius: 0px;
-	--toggle-thumb-radius: 0px;
-	--slider-thumb-radius: 0px;
+	--hd-radius: 8px;
+	--hd-transition: 0.25s ease;
+	--hd-h2-bg: linear-gradient(120deg, var(--color-accent), var(--hd-accent-2));
+	--radius-s: 4px;
+	--radius-m: 8px;
+	--radius-l: 12px;
+	--h1-size: 1.75em;
+	--h2-size: 1.5em;
+	--h3-size: 1.3em;
+	--h4-size: 1.15em;
+	--h5-size: 1.05em;
+	--h6-size: 1em;
+	--h1-weight: 700;
+	--h2-weight: 700;
+	--h3-weight: 650;
+	--h4-weight: 600;
+	--line-height-normal: 1.75;
+	--file-line-width: 46rem;
+	--callout-radius: var(--hd-radius);
+	--code-radius: var(--hd-radius);
+	--code-punctuation: var(--code-normal); /* 编辑器不给标点单独着色，阅读模式跟它一致 */
+	--blockquote-border-thickness: 4px;
+	--table-header-weight: 600;
+	--tag-radius: 999px;
+	--tag-padding-x: 0.65em;
+	--checklist-done-color: var(--text-faint);
+
+	/* 块间距 = 编辑模式一个空行的高度，阅读模式按它排版 */
+	--hd-block-gap: calc(var(--font-text-size) * var(--line-height-normal));
+	--hd-code-line: calc(var(--font-text-size) * 0.875 * var(--line-height-normal)); /* 编辑模式一行代码的高度 */
 }
 
-.workspace-tab-header.is-active::before, .workspace-tab-header.is-active::after {
-	display: none;
+.theme-light {
+	--accent-h: 210;
+	--accent-s: 80%;
+	--accent-l: 52%;
+	--hd-accent-soft: hsl(var(--accent-h) var(--accent-s) var(--accent-l) / 10%);
+	--hd-accent-mid: hsl(var(--accent-h) var(--accent-s) var(--accent-l) / 35%);
+	--hd-accent-2: hsl(calc(var(--accent-h) + 40) var(--accent-s) calc(var(--accent-l) + 8%));
+	--hd-on-accent: #fff;
+	--background-primary: #fdfdfe;
+	--background-primary-alt: #f5f7fa;
+	--background-secondary: #f2f5f9;
+	--background-secondary-alt: #e9eef4;
+	--text-normal: #24292f;
+	--text-muted: #5b6573;
+	--text-faint: #9aa3ae;
+	--h1-color: var(--text-normal);
+	--h3-color: var(--text-normal);
+	--h4-color: var(--color-accent);
+	--h5-color: var(--text-muted);
+	--h6-color: var(--text-faint);
+	--code-background: #f6f8fa;
+	--text-highlight-bg: hsl(48deg 100% 60% / 45%);
+	--blockquote-background-color: var(--hd-accent-soft);
+	--table-header-background: var(--hd-accent-soft);
+	--table-row-alt-background: rgb(0 0 0 / 1.8%);
 }
 
-svg * {
-	stroke-linecap: square;
-	stroke-linejoin: miter;
-	rx: 0;
-	ry: 0;
+.theme-dark {
+	--accent-h: 205;
+	--accent-s: 75%;
+	--accent-l: 62%;
+	--hd-accent-soft: hsl(var(--accent-h) var(--accent-s) var(--accent-l) / 12%);
+	--hd-accent-mid: hsl(var(--accent-h) var(--accent-s) var(--accent-l) / 35%);
+	--hd-accent-2: hsl(calc(var(--accent-h) + 40) var(--accent-s) calc(var(--accent-l) + 6%));
+
+	/* 暗色下强调色较亮，胶囊上用深色文字保证对比度 */
+	--hd-on-accent: #10151c;
+	--background-primary: #1b1e24;
+	--background-primary-alt: #20242b;
+	--background-secondary: #16181d;
+	--background-secondary-alt: #111317;
+	--text-normal: #d7dce2;
+	--text-muted: #9ba4b0;
+	--text-faint: #67707c;
+	--h1-color: var(--text-normal);
+	--h3-color: var(--text-normal);
+	--h4-color: var(--color-accent);
+	--h5-color: var(--text-muted);
+	--h6-color: var(--text-faint);
+	--code-background: #22262e;
+	--text-highlight-bg: hsl(45deg 90% 55% / 35%);
+	--blockquote-background-color: var(--hd-accent-soft);
+	--table-header-background: var(--hd-accent-soft);
+	--table-row-alt-background: rgb(255 255 255 / 2.5%);
 }
 
-.menu {
-	padding: var(--size-2-1);
+/* ========== 标题（阅读 / 编辑模式一致） ========== */
+
+/* 编辑模式的装饰只用绝对定位伪元素和行内背景，整行宽度不变，避免点击错位 */
+.markdown-preview-view h1,
+.markdown-source-view.mod-cm6 .HyperMD-header-1 {
+	position: relative;
+	padding-bottom: 0.35em;
+	text-align: center;
 }
 
-.menu-item {
-	padding: var(--size-4-1) var(--size-4-2);
+.markdown-preview-view h1::after,
+.markdown-source-view.mod-cm6 .HyperMD-header-1::after {
+	position: absolute;
+	bottom: 0;
+	left: 50%;
+	width: 3em;
+	height: 4px;
+	border-radius: 4px;
+	background: linear-gradient(90deg, var(--color-accent), var(--hd-accent-2));
+	content: "";
+	pointer-events: none;
+	transform: translateX(-50%);
+	transition: width var(--hd-transition);
 }
 
-.menu-separator {
-	margin: var(--size-2-1) calc(var(--size-2-1) * -1);
+.markdown-preview-view h1:hover::after,
+.markdown-source-view.mod-cm6 .HyperMD-header-1:hover::after {
+	width: 60%;
+}
+
+/* H2 胶囊：编辑模式画在整行上并收缩到文字宽度，换行后仍是一整块，与阅读模式一致 */
+.markdown-preview-view h2,
+.markdown-source-view.mod-cm6 .HyperMD-header-2 {
+	width: fit-content;
+	max-width: 100%;
+	padding: 0.2em 0.8em;
+	border-radius: var(--hd-radius);
+	background: var(--hd-h2-bg);
+	box-shadow: 0 3px 10px var(--hd-accent-mid);
+	color: var(--hd-on-accent);
+}
+
+.markdown-source-view.mod-cm6 .HyperMD-header-2 .cm-header-2 {
+	color: inherit;
+}
+
+/* Obsidian 对"标题 + 空行 + 标题"用高特异性规则把上内边距清零，这里必须覆盖，否则胶囊上下不对称 */
+.markdown-source-view.mod-cm6 .cm-line.HyperMD-header-2 {
+	padding-top: 0.2em !important;
+}
+
+.markdown-preview-view h2 .heading-collapse-indicator svg {
+	color: var(--hd-on-accent);
+}
+
+.markdown-preview-view h3,
+.markdown-source-view.mod-cm6 .HyperMD-header-3 {
+	position: relative;
+	padding-left: 0.7em;
+}
+
+.markdown-preview-view h3::before,
+.markdown-source-view.mod-cm6 .HyperMD-header-3::before {
+	position: absolute;
+	top: 50%;
+	left: 0;
+	width: 5px;
+	height: 1.1em;
+	border-radius: 4px;
+	background-color: var(--color-accent);
+	content: "";
+	pointer-events: none;
+	transform: translateY(-50%);
+}
+
+/* ========== 段落间距（阅读 / 编辑模式一致） ========== */
+
+/* 编辑模式：去掉 Obsidian 按上下文给标题行加的额外间距，块之间只由空行隔开 */
+.markdown-source-view.mod-cm6 .cm-line {
+	--p-spacing-empty: 0px;
+}
+
+.markdown-source-view.mod-cm6 .cm-line.HyperMD-header {
+	--p-spacing: 0px;
+}
+
+/* 阅读模式：块自身不留外边距，相邻块之间隔一个空行的高度 */
+.markdown-preview-view {
+	--heading-spacing: 0px;
+}
+
+.markdown-preview-sizer > [class^="el-"] > * {
+	margin-block: 0;
+}
+
+.markdown-preview-sizer > [class^="el-"] + [class^="el-"] {
+	padding-top: var(--hd-block-gap);
+}
+
+/* ========== 正文元素 ========== */
+.cm-s-obsidian span.cm-strong,
+.markdown-rendered strong {
+	color: var(--color-accent);
+}
+
+/* 胶囊内的粗体和 ## 标记跟随胶囊文字颜色 */
+.markdown-rendered h2 strong,
+.markdown-source-view.mod-cm6 .HyperMD-header-2 .cm-formatting-header {
+	color: inherit;
+}
+
+.markdown-rendered mark,
+.cm-s-obsidian span.cm-highlight {
+	padding: 0 0.15em;
+	border-radius: 3px;
+}
+
+.markdown-rendered a,
+.cm-s-obsidian span.cm-hmd-internal-link,
+.cm-s-obsidian span.cm-link {
+	text-decoration-color: var(--hd-accent-mid);
+	text-underline-offset: 3px;
+}
+
+/* 外链不显示末尾的箭头图标 */
+.external-link {
+	padding-right: 0;
+	background-image: none;
+}
+
+/* 引用块 */
+.markdown-rendered blockquote {
+	padding: 0.6em 1em;
+	border-radius: 0 var(--hd-radius) var(--hd-radius) 0;
+	background-color: var(--blockquote-background-color);
+}
+
+/* 编辑模式引用由多行拼成：首行、末行补内边距和圆角，与阅读模式一致 */
+.markdown-source-view.mod-cm6 .HyperMD-quote {
+	padding-inline-end: 1em;
+}
+
+.markdown-source-view.mod-cm6 .cm-line:not(.HyperMD-quote) + .HyperMD-quote {
+	padding-top: 0.6em;
+	border-start-end-radius: var(--hd-radius);
+}
+
+.markdown-source-view.mod-cm6 .HyperMD-quote:has(+ .cm-line:not(.HyperMD-quote)) {
+	padding-bottom: 0.6em;
+	border-end-end-radius: var(--hd-radius);
+}
+
+/* 行内代码 */
+.markdown-rendered :not(pre) > code,
+.cm-s-obsidian span.cm-inline-code {
+	padding: 0.1em 0.35em;
+	border-radius: 4px;
+	color: var(--color-accent);
+}
+
+/* 下面这组 token 映射靠先后顺序表达优先级（后写的更具体的覆盖前面的通用规则），不按特异性重排 */
+/* stylelint-disable no-descending-specificity */
+
+/* 代码高亮：阅读模式（Prism）和编辑模式（CodeMirror）切分 token 的方式不同，
+   统一映射到两边都能区分的几类颜色；函数名、类名、变量等编辑器分不出来的一律用正文色 */
+.markdown-rendered pre .token:is(.function, .class-name, .parameter, .variable, .property, .property-access, .constant, .operator, .selector, .combinator, .pseudo-class, .interpolation, .rule) {
+	color: var(--code-normal);
+}
+
+.markdown-rendered pre .token:is(.boolean, .null, .nil, .builtin, .important, .entity, .id, .hexcode, .symbol) {
+	color: var(--code-keyword);
+}
+
+.markdown-rendered pre .token:is(.regex, .regex-delimiter, .regex-source, .regex-flags, .interpolation-punctuation, .attr-value),
+.markdown-rendered pre .token.interpolation .token.delimiter {
+	color: var(--code-string);
+}
+
+.markdown-rendered pre .token.attr-value .token.punctuation {
+	color: var(--code-string);
+}
+
+.markdown-rendered pre .token.attr-value .token.attr-equals {
+	color: var(--code-normal);
+}
+
+/* bash 的命令名编辑器标为内置命令 */
+.markdown-rendered pre.language-bash .token.function {
+	color: var(--code-keyword);
+}
+
+.markdown-rendered pre .token.unit {
+	color: var(--code-value);
+}
+
+.markdown-rendered pre .token:is(.decorator, .annotation) {
+	color: var(--code-comment);
+}
+
+.markdown-rendered pre .token.attr-name,
+.markdown-rendered pre .token.parameter.variable {
+	color: var(--code-property);
+}
+
+/* 预处理指令、属性注解、diff 坐标行：编辑器整段标为 meta，阅读模式跟随用注释色 */
+.markdown-rendered pre:is(.language-c, .language-cpp) .token.macro,
+.markdown-rendered pre:is(.language-c, .language-cpp) .token.macro .token,
+.markdown-rendered pre .token:is(.attribute, .coord),
+.markdown-rendered pre .token.attribute .token {
+	color: var(--code-comment);
+}
+
+/* 以下按语言补齐：编辑器的标法与 Prism 不同，阅读模式向编辑器看齐 */
+.markdown-rendered pre.language-sql .token:is(.function, .operator),
+.markdown-rendered pre.language-yaml .token.key,
+.markdown-rendered pre.language-toml .token.table {
+	color: var(--code-keyword);
+}
+
+.markdown-rendered pre.language-php .token:is(.delimiter, .type-hint, .return-type),
+.markdown-rendered pre.language-yaml .token.null {
+	color: var(--code-normal);
+}
+
+.markdown-rendered pre.language-yaml .token.punctuation {
+	color: var(--code-comment);
+}
+
+.markdown-rendered pre.language-kotlin .token.interpolation,
+.markdown-rendered pre.language-kotlin .token.interpolation .token {
+	color: var(--code-string);
+}
+
+.markdown-rendered pre.language-ruby .token.class-name {
+	color: var(--code-tag);
+}
+
+/* stylelint-enable no-descending-specificity */
+
+.cm-s-obsidian span.cm-hmd-codeblock:is(.cm-def, .cm-variable, .cm-variable-2, .cm-variable-3, .cm-property, .cm-callee, .cm-qualifier, .cm-operator) {
+	color: var(--code-normal);
+}
+
+.cm-s-obsidian span.cm-hmd-codeblock:is(.cm-atom, .cm-builtin, .cm-type) {
+	color: var(--code-keyword);
+}
+
+.cm-s-obsidian span.cm-hmd-codeblock.cm-attribute {
+	color: var(--code-property);
+}
+
+.cm-s-obsidian span.cm-hmd-codeblock.cm-meta {
+	color: var(--code-comment);
+}
+
+/* 代码块：左侧强调色条 */
+.markdown-rendered pre {
+	border: 1px solid var(--background-modifier-border);
+	border-left: 3px solid var(--color-accent);
+}
+
+/* 编辑模式代码块由多行拼成：每行左色条 + 右边框，首行加上边框、末行加下边框，拼成和阅读模式一样的外框 */
+.markdown-source-view.mod-cm6 .HyperMD-codeblock-bg {
+	border-right: 1px solid var(--background-modifier-border);
+	border-left: 3px solid var(--color-accent);
+}
+
+.markdown-source-view.mod-cm6 .HyperMD-codeblock-begin-bg {
+	border-top: 1px solid var(--background-modifier-border);
+}
+
+.markdown-source-view.mod-cm6 .HyperMD-codeblock-end-bg {
+	border-bottom: 1px solid var(--background-modifier-border);
+}
+
+/* 编辑模式的语言标签和阅读模式的复制按钮一样，悬停时才出现 */
+.markdown-source-view.mod-cm6 .code-block-flair {
+	opacity: 0;
+	transition: opacity var(--hd-transition);
+}
+
+.markdown-source-view.mod-cm6 .HyperMD-codeblock-begin:hover .code-block-flair {
+	opacity: 1;
+}
+
+/* Mermaid 图用 Pele 渲染时（需配合插件）：颜色和字体跟随主题；mermaid.js 渲染时不受影响 */
+.pele {
+	--pele-bg: transparent;
+	--pele-fg: var(--text-normal);
+	--pele-muted: var(--text-muted);
+	--pele-line: var(--text-muted);
+	--pele-surface: var(--background-secondary);
+	--pele-surface-alt: var(--background-secondary-alt);
+	--pele-border: var(--hd-accent-mid);
+	--pele-accent: var(--color-accent);
+	--pele-font: var(--font-text);
+	--pele-radius: var(--radius-s);
+}
+
+/* Obsidian 暗色下会反转 mermaid.js 的浅色图；Pele 已按主题出深色，不能再反转 */
+.theme-dark .mermaid > svg.pele {
+	filter: none;
+}
+
+/* 表格 */
+.markdown-rendered table {
+	overflow: hidden;
+	border-radius: var(--hd-radius);
+	box-shadow: 0 0 0 1px var(--background-modifier-border);
+}
+
+.markdown-rendered tbody tr:nth-child(even) {
+	background-color: var(--table-row-alt-background);
+}
+
+.markdown-rendered tbody tr:hover {
+	background-color: var(--hd-accent-soft);
+}
+
+/* 分割线 */
+.markdown-rendered hr,
+.markdown-source-view.mod-cm6 .hr hr {
+	height: 2px;
+	border: none;
+	background: linear-gradient(90deg, transparent, var(--hd-accent-mid), transparent);
+}
+
+.markdown-preview-view .markdown-preview-sizer > .el-hr > hr {
+	margin-block: calc((var(--hd-block-gap) - 2px) / 2);
+}
+
+/* 阅读模式补齐编辑模式的块高度：代码块首尾各占一行代码高，表格组件上下留 --p-spacing，分割线占满一行 */
+.markdown-preview-sizer > .el-pre > pre {
+	padding-block: var(--hd-code-line);
+}
+
+/* pre 是正文字号，code 是代码字号，同行基线对齐会把每行撑高；code 设为块级后行高只由它自己决定 */
+.markdown-preview-sizer > .el-pre > pre > code {
+	display: block;
+}
+
+.markdown-preview-sizer > .el-table > table {
+	margin-block: var(--p-spacing);
+}
+
+
+/* 标签 */
+a.tag,
+.cm-s-obsidian span.cm-hashtag {
+	background-color: var(--hd-accent-soft);
+	color: var(--color-accent);
+}
+
+/* Callout：左侧色条 + 浅底 */
+.callout {
+	border-left: 4px solid var(--callout-color);
+}
+
+
+/* ========== 界面 ========== */
+
+/* 激活标签页标题 */
+.workspace-tab-header.is-active .workspace-tab-header-inner-title {
+	color: var(--color-accent);
+}
+
+/* ========== 文件列表（改编自 Phycat，MIT © XuJilong） ========== */
+
+/* 顺序沿用 Phycat 已验证的层叠关系，这里不按特异性重排 */
+/* stylelint-disable no-descending-specificity */
+body {
+	--nav-c-pink: #ff7096;
+	--nav-c-cyan: #3db8bf;
+	--nav-c-orange: #f59e0b;
+	--nav-c-green: #11aa63;
+	--nav-c-purple: #a06eb4;
+	--nav-c-red: #aa1141;
+	--nav-c-blue: #1d4e89;
+}
+
+/* 暗色下提亮深红、深蓝文件夹，避免和背景糊在一起 */
+.theme-dark {
+	--nav-c-red: #e0567a;
+	--nav-c-blue: #5b8fd6;
+}
+
+.nav-files-container {
+	--folder-color: var(--text-muted);
+	--nav-item-color: var(--text-muted);
+	--nav-item-color-hover: var(--text-normal);
+	--nav-item-color-active: var(--color-accent);
+	--nav-item-weight-hover: var(--nav-item-weight);
+	--nav-item-background-hover: color-mix(in srgb, var(--color-accent), transparent 96%);
+	--nav-item-background-active: color-mix(in srgb, var(--color-accent), transparent 91%);
+	--background-modifier-active-hover: var(--nav-item-background-active);
+}
+
+.theme-dark .nav-files-container {
+	--nav-item-background-hover: color-mix(in srgb, var(--color-accent), transparent 94%);
+	--nav-item-background-active: color-mix(in srgb, var(--color-accent), transparent 86%);
+}
+
+.nav-files-container>div>.nav-folder:not(.mod-root):nth-child(7n+1),
+.nav-files-container .nav-folder.mod-root>.nav-folder-children>.nav-folder:nth-child(7n+1) {
+	--folder-color: var(--nav-c-pink);
+}
+
+.nav-files-container>div>.nav-folder:not(.mod-root):nth-child(7n+2),
+.nav-files-container .nav-folder.mod-root>.nav-folder-children>.nav-folder:nth-child(7n+2) {
+	--folder-color: var(--nav-c-cyan);
+}
+
+.nav-files-container>div>.nav-folder:not(.mod-root):nth-child(7n+3),
+.nav-files-container .nav-folder.mod-root>.nav-folder-children>.nav-folder:nth-child(7n+3) {
+	--folder-color: var(--nav-c-orange);
+}
+
+.nav-files-container>div>.nav-folder:not(.mod-root):nth-child(7n+4),
+.nav-files-container .nav-folder.mod-root>.nav-folder-children>.nav-folder:nth-child(7n+4) {
+	--folder-color: var(--nav-c-green);
+}
+
+.nav-files-container>div>.nav-folder:not(.mod-root):nth-child(7n+5),
+.nav-files-container .nav-folder.mod-root>.nav-folder-children>.nav-folder:nth-child(7n+5) {
+	--folder-color: var(--nav-c-purple);
+}
+
+.nav-files-container>div>.nav-folder:not(.mod-root):nth-child(7n+6),
+.nav-files-container .nav-folder.mod-root>.nav-folder-children>.nav-folder:nth-child(7n+6) {
+	--folder-color: var(--nav-c-red);
+}
+
+.nav-files-container>div>.nav-folder:not(.mod-root):nth-child(7n+7),
+.nav-files-container .nav-folder.mod-root>.nav-folder-children>.nav-folder:nth-child(7n+7) {
+	--folder-color: var(--nav-c-blue);
+}
+
+.nav-files-container .nav-folder {
+	border: 0;
+	border-radius: 0;
+	background-color: transparent;
+}
+
+.nav-files-container>div>.nav-folder:not(.mod-root),
+.nav-files-container .nav-folder.mod-root>.nav-folder-children>.nav-folder {
+	margin-bottom: 10px;
+}
+
+.nav-files-container .nav-folder-title {
+	position: relative;
+	align-items: center;
+	min-height: 34px;
+	padding: 6px 10px;
+	margin: 2px 0;
+	border-radius: 10px;
+	color: var(--text-normal);
+	font-weight: 500;
+	transition: background-color 160ms ease;
+}
+
+:where(.nav-files-container > div > .nav-folder:not(.mod-root), .nav-files-container .nav-folder.mod-root > .nav-folder-children > .nav-folder)>.nav-folder-title {
+	min-height: 36px;
+	background-color: color-mix(in srgb, var(--folder-color), transparent 95%);
+}
+
+.theme-dark :where(.nav-files-container > div > .nav-folder:not(.mod-root), .nav-files-container .nav-folder.mod-root > .nav-folder-children > .nav-folder)>.nav-folder-title {
+	background-color: color-mix(in srgb, var(--folder-color), transparent 92%);
+}
+
+.nav-files-container .nav-folder-title-content,
+.nav-files-container .nav-file-title-content {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+.nav-files-container .nav-folder-title-content:not([contenteditable="true"]),
+.nav-files-container .nav-file-title-content:not([contenteditable="true"]) {
+	white-space: var(--nav-item-white-space, nowrap);
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.nav-files-container .nav-folder-title>.collapse-icon {
+	position: static;
+	order: 2;
+	display: flex;
+	flex: 0 0 16px;
+	width: 16px;
+	margin-inline: 8px 0;
+	align-items: center;
+	justify-content: center;
+	color: var(--text-muted);
+	opacity: 0.65;
+}
+
+.nav-files-container .nav-folder-title>.collapse-icon svg.svg-icon {
+	width: 12px;
+	height: 12px;
+	color: inherit;
+	stroke-width: 1.6px;
+}
+
+.nav-files-container .nav-folder-children {
+	margin-inline-start: 18px;
+	padding-inline-start: 10px;
+	margin-block: 4px 6px;
+	border-inline-start: 1px solid color-mix(in srgb, var(--folder-color), transparent 82%);
+	transition: border-color 160ms ease;
+}
+
+.nav-files-container .nav-folder.mod-root>.nav-folder-children {
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+.nav-files-container .nav-file {
+	overflow: clip;
+	border-radius: 8px;
+}
+
+.nav-files-container .nav-folder:not(.mod-root) .nav-folder {
+	overflow: clip;
+	border-radius: 10px;
+}
+
+.nav-files-container .nav-file-title {
+	align-items: center;
+	min-height: 30px;
+	padding: 5px 8px;
+	margin: 1px 0;
+	border-radius: 8px;
+	color: var(--text-muted);
+	transition: background-color 160ms ease, color 160ms ease;
+}
+
+.nav-files-container .nav-file-title.is-active {
+	background-color: var(--nav-item-background-active);
+	color: var(--color-accent);
+	font-weight: 500;
+}
+
+.nav-files-container .nav-file-title.is-active .nav-file-title-content::before {
+	background-color: var(--color-accent);
+	opacity: 1;
+}
+
+@media (hover:hover) {
+	body:not(.is-grabbing) .nav-files-container .nav-folder-title:where(:not(.is-selected, .is-being-dragged, .is-being-dragged-over)):hover {
+		color: var(--text-normal);
+		font-weight: 500;
+		background-color: color-mix(in srgb, var(--folder-color), transparent 90%);
+	}
+
+	body:not(.is-grabbing) .nav-files-container .nav-file-title:where(:not(.is-selected, .is-being-dragged, .is-being-dragged-over)):hover {
+		color: var(--text-normal);
+		font-weight: var(--nav-item-weight);
+		background-color: var(--nav-item-background-hover);
+	}
+
+	body:not(.is-grabbing) .nav-files-container .nav-file-title.is-active:where(:not(.is-selected, .is-being-dragged, .is-being-dragged-over)):hover {
+		color: var(--color-accent);
+		font-weight: 500;
+		background-color: color-mix(in srgb, var(--color-accent), transparent 85%);
+	}
+
+	.nav-files-container .nav-folder:hover>.nav-folder-children {
+		border-inline-start-color: color-mix(in srgb, var(--folder-color), transparent 70%);
+	}
+
+	.nav-files-container .nav-folder-title:hover>.collapse-icon {
+		opacity: 0.95;
+	}
+}
+
+.nav-files-container :is(.nav-file-title, .nav-folder-title).is-selected {
+	color: var(--nav-item-color-selected);
+	background-color: var(--nav-item-background-selected);
+}
+
+.nav-files-container .nav-folder.is-being-dragged-over>.nav-folder-title,
+.nav-files-container :is(.nav-file-title, .nav-folder-title).is-being-dragged-over {
+	color: var(--color-accent);
+	background-color: color-mix(in srgb, var(--color-accent), transparent 85%);
+}
+
+.nav-files-container :is(.nav-file-title, .nav-folder-title).is-being-dragged {
+	color: var(--text-on-accent);
+	background-color: var(--interactive-accent);
+}
+
+.nav-files-container .nav-folder-title.is-being-dragged>.collapse-icon {
+	color: var(--text-on-accent);
+}
+
+.nav-files-container .nav-folder-title-content:not([contenteditable="true"])::before,
+.nav-files-container .nav-file-title-content:not([contenteditable="true"])::before {
+	content: "";
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	margin-right: 8px;
+	vertical-align: text-bottom;
+	background-color: currentcolor;
+	mask-repeat: no-repeat;
+	mask-size: contain;
+	transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.nav-files-container .nav-file-title-content:not([contenteditable="true"])::before {
+	width: 14px;
+	height: 14px;
+	opacity: 0.6;
+}
+
+.nav-files-container .nav-file-title:hover .nav-file-title-content:not([contenteditable="true"])::before {
+	opacity: 0.9;
+}
+
+.nav-files-container .nav-folder-title-content:not([contenteditable="true"])::before {
+	mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z'/%3E%3C/svg%3E");
+	opacity: 0.8;
+}
+
+.nav-files-container .nav-folder:not(.is-collapsed)>.nav-folder-title .nav-folder-title-content:not([contenteditable="true"])::before {
+	mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 14 1.45-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.55 6a2 2 0 0 1-1.94 1.5H4a2 2 0 0 1-2-2V5c0-1.1.9-2 2-2h3.93a2 2 0 0 1 1.66.9l.82 1.2a2 2 0 0 0 1.66.9H18a2 2 0 0 1 2 2v2'/%3E%3C/svg%3E");
+	opacity: 1;
+}
+
+.nav-files-container .nav-file-title-content:not([contenteditable="true"])::before {
+	mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z'/%3E%3Cpolyline points='14 2 14 8 20 8'/%3E%3C/svg%3E");
+}
+
+.nav-files-container .nav-file-title[data-path$=".png" i] .nav-file-title-content:not([contenteditable="true"])::before,
+.nav-files-container .nav-file-title[data-path$=".jpg" i] .nav-file-title-content:not([contenteditable="true"])::before,
+.nav-files-container .nav-file-title[data-path$=".jpeg" i] .nav-file-title-content:not([contenteditable="true"])::before,
+.nav-files-container .nav-file-title[data-path$=".gif" i] .nav-file-title-content:not([contenteditable="true"])::before,
+.nav-files-container .nav-file-title[data-path$=".svg" i] .nav-file-title-content:not([contenteditable="true"])::before,
+.nav-files-container .nav-file-title[data-path$=".webp" i] .nav-file-title-content:not([contenteditable="true"])::before {
+	mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect width='18' height='18' x='3' y='3' rx='2' ry='2'/%3E%3Ccircle cx='9' cy='9' r='2'/%3E%3Cpath d='m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21'/%3E%3C/svg%3E");
+}
+
+.nav-files-container .nav-file-title[data-path$=".canvas" i] .nav-file-title-content:not([contenteditable="true"])::before {
+	mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect width='7' height='9' x='3' y='3' rx='1'/%3E%3Crect width='7' height='5' x='14' y='3' rx='1'/%3E%3Crect width='7' height='9' x='14' y='12' rx='1'/%3E%3Crect width='7' height='5' x='3' y='16' rx='1'/%3E%3C/svg%3E");
+}
+
+.nav-files-container .nav-file-title[data-path$=".base" i] .nav-file-title-content:not([contenteditable="true"])::before {
+	mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cellipse cx='12' cy='5' rx='9' ry='3'/%3E%3Cpath d='M3 5V19A9 3 0 0 0 21 19V5'/%3E%3Cpath d='M3 12A9 3 0 0 0 21 12'/%3E%3C/svg%3E");
+}
+
+.nav-files-container .nav-folder-title-content:not([contenteditable="true"])::before {
+	background-color: var(--folder-color);
+	margin-right: 10px;
+	opacity: 0.9;
+}
+
+.nav-files-container .nav-folder .nav-folder .nav-folder-title-content:not([contenteditable="true"])::before {
+	background-color: var(--text-muted);
+	opacity: 0.75;
+}
+
+.nav-files-container .nav-folder.mod-root>.nav-folder-children>.nav-folder>.nav-folder-title .nav-folder-title-content:not([contenteditable="true"])::before {
+	background-color: var(--folder-color);
+	opacity: 0.9;
+}
+
+.nav-files-container :is(.nav-file-title, .nav-folder-title).is-being-dragged :is(.nav-file-title-content, .nav-folder-title-content)::before {
+	background-color: currentcolor !important;
+}
+/* stylelint-enable no-descending-specificity */
+
+@media (prefers-reduced-motion: reduce) {
+	.markdown-preview-view h1::after {
+		transition: none;
+	}
 }

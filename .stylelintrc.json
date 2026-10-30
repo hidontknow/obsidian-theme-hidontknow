@@ -1,3 +1,9 @@
 {
-    "extends": "stylelint-config-obsidianmd"
+    "extends": "stylelint-config-obsidianmd",
+    "rules": {
+        "selector-class-pattern": [
+            "^(HyperMD-)?[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+            { "message": "类名需为 kebab-case（Obsidian 编辑器的 HyperMD-* 类名除外）" }
+        ]
+    }
 }
