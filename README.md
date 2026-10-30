@@ -34,8 +34,6 @@
 
 插件 [Pele Mermaid](https://github.com/hidontknow/obsidian-pele-mermaid) 用 [Pele](https://github.com/obsidianmd/pele) 代替内置的 mermaid.js 渲染 Mermaid 图。主题已为 Pele 的图适配亮色 / 暗色配色；不装插件时，Mermaid 图照常由 mermaid.js 渲染。
 
-该插件仅用于尝鲜：Obsidian 1.15 将改用 Pele 渲染 Mermaid 图（以官方发布说明为准），届时无需再装插件。
-
 ## 开发
 
 ```bash
