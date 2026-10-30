@@ -143,6 +143,11 @@ body {
 	color: inherit;
 }
 
+/* 编辑器插入的光标辅助图片（text-top）和折叠箭头（baseline）会把标题行框撑高 0.7–2px，对齐到行顶后与阅读模式同高 */
+.markdown-source-view.mod-cm6 .HyperMD-header > :is(img, .cm-fold-indicator) {
+	vertical-align: top;
+}
+
 .markdown-preview-view h2 .heading-collapse-indicator svg {
 	color: var(--hd-on-accent);
 }
@@ -191,6 +196,86 @@ body {
 	padding-top: var(--hd-block-gap);
 }
 
+/* ========== 列表与任务缩进（阅读 / 编辑模式一致） ========== */
+
+/* 实时预览按标记（"- "、"1. "、复选框）的实际宽度计算每行缩进，
+   这里把标记统一成固定宽度，再让阅读模式第一层左边距与之相同；嵌套每层都是 --list-indent */
+body {
+	--hd-list-marker: round(1.625em, 1px); /* 编辑器按标记宽度向下取整算缩进，取整数像素才不丢小数 */
+}
+
+.markdown-source-view.mod-cm6.is-live-preview .HyperMD-list-line .cm-formatting-list {
+	display: inline-flex;
+	width: var(--hd-list-marker);
+}
+
+/* 圆点居中于标记区，与阅读模式的圆点位置一致 */
+.markdown-source-view.mod-cm6.is-live-preview .HyperMD-list-line .list-bullet {
+	margin-inline-start: -2px;
+}
+
+/* 序号靠右，位数多时向左伸出，与阅读模式的列表序号一致；保留序号后的空格 */
+.markdown-source-view.mod-cm6.is-live-preview .HyperMD-list-line .cm-formatting-list-ol {
+	justify-content: flex-end;
+}
+
+.markdown-source-view.mod-cm6.is-live-preview .HyperMD-list-line .list-number {
+	white-space: pre;
+}
+
+/* 复选框靠右，与阅读模式一样位于文字左侧约 24px；宽度扣掉标签的 -0.25em 外边距和其后的空格 */
+.markdown-source-view.mod-cm6.is-live-preview .HyperMD-list-line .task-list-label {
+	display: inline-flex;
+	justify-content: flex-end;
+	width: calc(var(--hd-list-marker) + 0.25em - 0.275em); /* 0.25em 抵消 Obsidian 给标签的 -0.25em 外边距 */
+}
+
+/* 阅读模式复选框默认左移 1.5 倍尺寸，只在尺寸 = 16px 时让文字落在列表文字位置；改为左移"尺寸 + 右外边距"，任何字号都对齐 */
+.markdown-rendered ul > li.task-list-item > .task-list-item-checkbox,
+.markdown-rendered ul > li.task-list-item > p > .task-list-item-checkbox {
+	margin-inline-start: calc(-1 * var(--checkbox-size) - 0.6em);
+}
+
+/* 复选框到文字 = 右外边距 + 其后的空格，合计取阅读模式的 0.6em。
+   inline-flex 标签的基线就是复选框底边，再下移 0.2em，与阅读模式的定位方式相同，任何字号都同高 */
+.markdown-source-view.mod-cm6.is-live-preview .HyperMD-list-line .task-list-label .task-list-item-checkbox {
+	top: 0.2em;
+	margin-inline-end: calc(0.6em - 0.275 * var(--font-text-size)); /* 0.6em 按复选框字号；空格宽按正文字号 */
+}
+
+.markdown-rendered :is(ul, ol) > li {
+	margin-inline-start: var(--hd-list-marker);
+}
+
+/* 已完成项的删除线会传给嵌套子列表且无法在子项上取消；inline-block 能截断传递，颜色也恢复，与编辑模式一致 */
+.markdown-rendered li.task-list-item:is([data-task="x"], [data-task="X"]) > :is(ul, ol) {
+	display: inline-block;
+	width: 100%;
+	vertical-align: top;
+	color: var(--text-normal);
+}
+
+/* Obsidian 默认在"有序列表里套无序列表"时只缩进 --hd-list-marker，统一为每层 --list-indent，与编辑模式的 Tab 缩进一致 */
+.markdown-rendered li > :is(ul, ol) > li {
+	margin-inline-start: var(--list-indent);
+}
+
+/* 编辑模式每行都有上下 --list-spacing；阅读模式父项的下内边距要到子列表结束才出现，子列表上移补回、下方抵消，每层不再早 1.2px */
+.markdown-rendered li > :is(ul, ol) {
+	margin-block: var(--list-spacing) calc(-1 * var(--list-spacing));
+}
+
+/* 编辑模式的图片嵌入是底部对齐的 inline-flex，阅读模式照做，去掉图片下方的基线空隙 */
+.markdown-rendered .internal-embed.image-embed {
+	display: inline-flex;
+	vertical-align: bottom;
+}
+
+/* 脚注上标不撑高所在行，与编辑模式一致 */
+.markdown-rendered sup.footnote-ref {
+	line-height: 0;
+}
+
 /* ========== 正文元素 ========== */
 .cm-s-obsidian span.cm-strong,
 .markdown-rendered strong {
@@ -233,6 +318,23 @@ body {
 	padding-inline-end: 1em;
 }
 
+/* 每级 "> " 固定为色条 + 1em 宽，正文与阅读模式的左内边距对齐；编辑器按它的实际宽度（向下取整）算换行缩进。
+   嵌套级拆成 ">"（色条 + 0.75em）和其后的空格（0.25em），都取整数像素，避免累计成 39.99px 被取整成 39 */
+.markdown-source-view.mod-cm6 .HyperMD-quote > :is(.cm-formatting-quote, .cm-blockquote-border) {
+	display: inline-block;
+	min-width: calc(var(--blockquote-border-thickness) + 1em); /* 只补宽不限宽：行首还带 Tab 时按实际宽度，不会在里面折行 */
+	text-indent: 0;
+}
+
+.markdown-source-view.mod-cm6 .HyperMD-quote > .cm-blockquote-border {
+	min-width: calc(var(--blockquote-border-thickness) + 0.75em);
+}
+
+.markdown-source-view.mod-cm6 .HyperMD-quote > .cm-formatting-quote:not(.cm-formatting-quote-1) {
+	width: 0.25em;
+	min-width: 0;
+}
+
 .markdown-source-view.mod-cm6 .cm-line:not(.HyperMD-quote) + .HyperMD-quote {
 	padding-top: 0.6em;
 	border-start-end-radius: var(--hd-radius);
@@ -243,9 +345,60 @@ body {
 	border-end-end-radius: var(--hd-radius);
 }
 
+/* 空的 ">" 行只当段落分隔，高度取阅读模式引用内的段落间距 1em */
+.markdown-source-view.mod-cm6 .HyperMD-quote:not(:has(> .cm-quote:not(.cm-formatting))) {
+	line-height: 1em;
+}
+
+/* 嵌套引用（第二级）：用 ::after 画出阅读模式里的内框，色条收到内框范围内；首行、末行的留白与阅读模式的外边距和内边距相同 */
+.markdown-source-view.mod-cm6 .HyperMD-quote-2 {
+	--hd-q2-top: 0px;
+	--hd-q2-bottom: 0px;
+	--hd-q2-radius-top: 0px;
+	--hd-q2-radius-bottom: 0px;
+
+	isolation: isolate;
+	padding-inline-end: 2em;
+}
+
+.markdown-source-view.mod-cm6 .HyperMD-quote-2::after {
+	position: absolute;
+	z-index: -1;
+	inset: var(--hd-q2-top) 1em var(--hd-q2-bottom) calc(var(--blockquote-border-thickness) + 1em);
+	border-radius: 0 var(--hd-q2-radius-top) var(--hd-q2-radius-bottom) 0;
+	background-color: var(--blockquote-background-color);
+	content: "";
+	pointer-events: none;
+}
+
+.markdown-source-view.mod-cm6 .HyperMD-quote-2 > .cm-blockquote-border::before {
+	top: var(--hd-q2-top);
+	bottom: var(--hd-q2-bottom);
+}
+
+.markdown-source-view.mod-cm6 .HyperMD-quote-1 + .HyperMD-quote-2 {
+	--hd-q2-top: 1em;
+	--hd-q2-radius-top: var(--hd-radius);
+
+	padding-top: 1.6em;
+}
+
+.markdown-source-view.mod-cm6 .HyperMD-quote-2:has(+ .cm-line:not(.HyperMD-quote-2)) {
+	--hd-q2-radius-bottom: var(--hd-radius);
+
+	padding-bottom: 0.6em;
+}
+
+.markdown-source-view.mod-cm6 .HyperMD-quote-2:has(+ .cm-line:not(.HyperMD-quote)) {
+	--hd-q2-bottom: 0.6em;
+
+	padding-bottom: 1.2em;
+}
+
 /* 行内代码 */
 .markdown-rendered :not(pre) > code,
-.cm-s-obsidian span.cm-inline-code {
+.cm-s-obsidian span.cm-inline-code,
+.cm-s-obsidian .cm-inline-code:not(.cm-formatting) /* 盖过 Obsidian 同名规则的 0.15em 0.3em */ {
 	padding: 0.1em 0.35em;
 	border-radius: 4px;
 	color: var(--color-accent);
@@ -422,7 +575,7 @@ body {
 	margin-block: calc((var(--hd-block-gap) - 2px) / 2);
 }
 
-/* 阅读模式补齐编辑模式的块高度：代码块首尾各占一行代码高，表格组件上下留 --p-spacing，分割线占满一行 */
+/* 阅读模式补齐编辑模式的块高度：代码块首尾各占一行代码高，表格组件上下留 --size-4-4（编辑器固定用它，不随字号变），分割线占满一行 */
 .markdown-preview-sizer > .el-pre > pre {
 	padding-block: var(--hd-code-line);
 }
@@ -433,7 +586,7 @@ body {
 }
 
 .markdown-preview-sizer > .el-table > table {
-	margin-block: var(--p-spacing);
+	margin-block: var(--size-4-4);
 }
 
 

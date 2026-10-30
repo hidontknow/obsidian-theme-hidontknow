@@ -2,16 +2,29 @@
 
 English | [简体中文](README.zh-CN.md)
 
-A clean Obsidian theme with light and dark modes. Reading view and editing view look the same. The heading styles draw on [Phycat](https://github.com/sumruler/obsidian-theme-phycat), and the colors and components draw on [Blue Topaz](https://github.com/whyt-byte/Blue-Topaz_Obsidian-css). The file explorer styles are adapted from Phycat (MIT); everything else is original.
+A clean Obsidian theme with light and dark modes, built so that **reading view and editing view look the same**. The heading styles draw on [Phycat](https://github.com/sumruler/obsidian-theme-phycat), and the colors and components draw on [Blue Topaz](https://github.com/whyt-byte/Blue-Topaz_Obsidian-css). The file explorer styles are adapted from Phycat (MIT); everything else is original.
 
 Requires Obsidian 1.14.0 or later.
 
 ![Hidontknow in light mode](screenshots/screenshot.png)
 
+## Reading view = editing view
+
+This is the main feature of the theme. Switching between reading view and editing view (Live Preview) does not move or restyle your content: every line of text sits at the same position, with the same size, weight, color and background.
+
+- **What is aligned**: headings (including the H2 pill height), paragraph and block spacing, list and task indents, bullets and checkboxes, blockquotes (including nested ones and long wrapped lines), code blocks (frame, line height and highlight colors), tables, callouts, horizontal rules, images, embeds, math and the properties block.
+- **How it is checked**: a script measures both views of the same note element by element. Positions match to within 0.05px in light and dark mode, at font sizes 14–20 and tab indent sizes 2, 4 and 8. Clicking in the editor still places the cursor exactly where you click.
+- **What cannot match**: a few differences come from how Obsidian itself renders the two views, and CSS cannot change them:
+  - Lists inside blockquotes are not parsed as lists in the editor, so they show `- ` and lack list spacing.
+  - Code blocks nested in a list span the full width in the editor, because the list indent is part of the code text.
+  - Footnotes show as `[^1]` in the editor; reading view shows `[1]` and moves the footnote text to the end.
+  - `%%comments%%` are visible in the editor and hidden in reading view.
+  - Ordered lists are renumbered in reading view (a `10.` after `3.` becomes `4.`).
+  - A few code tokens are colored differently, because the two views use different highlighters (Prism and CodeMirror).
+
 ## Features
 
-- **Headings**: H1 is centered with a gradient underline that grows on hover. H2 is a gradient pill. H3 has a colored bar on the left. H4 uses the accent color. Headings look the same in reading and editing view, long H2 headings stay one pill when they wrap, and clicking a heading in the editor places the cursor correctly.
-- **Spacing**: Reading view uses the same spacing as editing view, with one blank line between blocks, so content barely moves when you switch views.
+- **Headings**: H1 is centered with a gradient underline that grows on hover. H2 is a gradient pill. H3 has a colored bar on the left. H4 uses the accent color. Long H2 headings stay one pill when they wrap.
 - **Text**: Bold text and inline code use the accent color. Blockquotes have a tinted background. Code blocks have an accent bar on the left. Tables have rounded corners and striped rows. Horizontal rules use a gradient.
 - **Code highlighting**: Reading view (Prism) and editing view (CodeMirror) use the same colors for keywords, strings, numbers, comments and attributes.
 - **File explorer**: Rounded rows, rainbow folders (top-level folders cycle through 7 colors) and thin indent guides. File icons show the file type: notes, images, PDF, audio, video, code, Office documents / spreadsheets / presentations, archives, Canvas, Base and Excalidraw. Files and folders line up.
