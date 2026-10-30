@@ -2,6 +2,8 @@
 
 一款简洁的 Obsidian 主题，支持亮色 / 暗色。设计参考了 [Phycat](https://github.com/sumruler/obsidian-theme-phycat) 的标题装饰和 [Blue Topaz](https://github.com/whyt-byte/Blue-Topaz_Obsidian-css) 的配色与组件风格，文件列表样式改编自 Phycat（MIT），其余为原创实现。
 
+![Hidontknow 亮色主题截图](screenshots/screenshot.png)
+
 ## 特性
 
 - **标题**：H1 居中，带渐变下划线（悬停变长）；H2 渐变胶囊；H3 左侧色条；H4 强调色。阅读模式和编辑模式外观一致，长标题换行后仍是完整的胶囊，编辑时点击定位准确。
@@ -43,3 +45,7 @@ npm run lint
 
 - [Blue Topaz](https://github.com/whyt-byte/Blue-Topaz_Obsidian-css)，MIT，© whyt-byte
 - [Phycat](https://github.com/sumruler/obsidian-theme-phycat)，MIT，© XuJilong
+
+## 许可
+
+[MIT](LICENSE) © hidontknow。文件列表样式改编自 Phycat，其 MIT 许可声明附在 LICENSE 末尾。
