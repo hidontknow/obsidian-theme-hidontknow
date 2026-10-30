@@ -129,7 +129,10 @@ body {
 .markdown-source-view.mod-cm6 .HyperMD-header-2 {
 	width: fit-content;
 	max-width: 100%;
-	padding: 0.2em 0.8em;
+
+	/* 上下留白用透明边框：背景默认铺到边框下，效果同内边距，且不受 Obsidian 清零标题上内边距的规则影响 */
+	padding: 0 0.8em;
+	border-block: 0.2em solid transparent;
 	border-radius: var(--hd-radius);
 	background: var(--hd-h2-bg);
 	box-shadow: 0 3px 10px var(--hd-accent-mid);
@@ -138,11 +141,6 @@ body {
 
 .markdown-source-view.mod-cm6 .HyperMD-header-2 .cm-header-2 {
 	color: inherit;
-}
-
-/* Obsidian 对"标题 + 空行 + 标题"用高特异性规则把上内边距清零，这里必须覆盖，否则胶囊上下不对称 */
-.markdown-source-view.mod-cm6 .cm-line.HyperMD-header-2 {
-	padding-top: 0.2em !important;
 }
 
 .markdown-preview-view h2 .heading-collapse-indicator svg {
@@ -214,7 +212,6 @@ body {
 .markdown-rendered a,
 .cm-s-obsidian span.cm-hmd-internal-link,
 .cm-s-obsidian span.cm-link {
-	text-decoration-color: var(--hd-accent-mid);
 	text-underline-offset: 3px;
 }
 
@@ -854,23 +851,24 @@ body {
 }
 
 .nav-files-container .nav-folder-title-content:not([contenteditable="true"])::before {
-	background-color: var(--folder-color);
+	background-color: var(--hd-folder-icon-color, var(--folder-color));
 	margin-right: 10px;
 	opacity: 0.9;
 }
 
 .nav-files-container .nav-folder .nav-folder .nav-folder-title-content:not([contenteditable="true"])::before {
-	background-color: var(--text-muted);
+	background-color: var(--hd-folder-icon-color, var(--text-muted));
 	opacity: 0.75;
 }
 
 .nav-files-container .nav-folder.mod-root>.nav-folder-children>.nav-folder>.nav-folder-title .nav-folder-title-content:not([contenteditable="true"])::before {
-	background-color: var(--folder-color);
+	background-color: var(--hd-folder-icon-color, var(--folder-color));
 	opacity: 0.9;
 }
 
-.nav-files-container :is(.nav-file-title, .nav-folder-title).is-being-dragged :is(.nav-file-title-content, .nav-folder-title-content)::before {
-	background-color: currentcolor !important;
+/* 拖拽中的条目：文件夹图标改用文字颜色（各图标规则读取这个变量，无需 !important） */
+.nav-files-container :is(.nav-file-title, .nav-folder-title).is-being-dragged {
+	--hd-folder-icon-color: currentcolor;
 }
 /* stylelint-enable no-descending-specificity */
 

@@ -1,51 +1,60 @@
 # Hidontknow
 
-一款简洁的 Obsidian 主题，支持亮色 / 暗色。设计参考了 [Phycat](https://github.com/sumruler/obsidian-theme-phycat) 的标题装饰和 [Blue Topaz](https://github.com/whyt-byte/Blue-Topaz_Obsidian-css) 的配色与组件风格，文件列表样式改编自 Phycat（MIT），其余为原创实现。
+English | [简体中文](README.zh-CN.md)
 
-![Hidontknow 亮色主题截图](screenshots/screenshot.png)
+A clean Obsidian theme with light and dark modes. Reading view and editing view look the same. The heading styles draw on [Phycat](https://github.com/sumruler/obsidian-theme-phycat), and the colors and components draw on [Blue Topaz](https://github.com/whyt-byte/Blue-Topaz_Obsidian-css). The file explorer styles are adapted from Phycat (MIT); everything else is original.
 
-## 特性
+Requires Obsidian 1.14.0 or later.
 
-- **标题**：H1 居中，带渐变下划线（悬停变长）；H2 渐变胶囊；H3 左侧色条；H4 强调色。阅读模式和编辑模式外观一致，长标题换行后仍是完整的胶囊，编辑时点击定位准确。
-- **段落间距**：阅读模式按编辑模式的空行排版，块与块之间隔一个空行的高度，两种模式切换时内容基本不跳动。
-- **正文**：粗体为强调色，引用块有浅色背景，行内代码为强调色，代码块左侧带色条，表格圆角并隔行变色，分割线为渐变。
-- **文件列表**：沿用 Phycat 样式，圆角标题行、彩虹文件夹（顶层文件夹按 7 色轮换）、细层级线；文件图标按类型区分（笔记、图片、PDF、音频、视频、代码、Office 文档 / 表格 / 演示、压缩包、Canvas、Base、Excalidraw），文件与文件夹文字对齐。
-- **其他**：标签做成胶囊样式，外链不显示末尾箭头图标，Callout 左侧带色条，已完成的任务文字变淡。
-- 尊重系统的「减少动态效果」设置。
+![Hidontknow in light mode](screenshots/screenshot.png)
 
-## 安装
+## Features
 
-1. 在库的 `.obsidian/themes/` 下新建文件夹 `Hidontknow`。
-2. 把 `theme.css` 和 `manifest.json` 复制进去（开发时可以用软链接）。
-3. 打开 **设置 → 外观 → 主题**，选择 **Hidontknow**。
+- **Headings**: H1 is centered with a gradient underline that grows on hover. H2 is a gradient pill. H3 has a colored bar on the left. H4 uses the accent color. Headings look the same in reading and editing view, long H2 headings stay one pill when they wrap, and clicking a heading in the editor places the cursor correctly.
+- **Spacing**: Reading view uses the same spacing as editing view, with one blank line between blocks, so content barely moves when you switch views.
+- **Text**: Bold text and inline code use the accent color. Blockquotes have a tinted background. Code blocks have an accent bar on the left. Tables have rounded corners and striped rows. Horizontal rules use a gradient.
+- **Code highlighting**: Reading view (Prism) and editing view (CodeMirror) use the same colors for keywords, strings, numbers, comments and attributes.
+- **File explorer**: Rounded rows, rainbow folders (top-level folders cycle through 7 colors) and thin indent guides. File icons show the file type: notes, images, PDF, audio, video, code, Office documents / spreadsheets / presentations, archives, Canvas, Base and Excalidraw. Files and folders line up.
+- **Other**: Tags are pills, external links have no trailing arrow icon, callouts have a colored bar on the left, and completed tasks are dimmed.
+- Respects the system "reduce motion" setting.
 
-## 改色
+## Installation
 
-强调色由 `--accent-h/s/l` 推导，主题为亮色和暗色分别设了默认值。想换颜色，可以新建一个 CSS 片段：
+Search for **Hidontknow** in **Settings → Appearance → Themes → Manage** (once the theme is listed in the theme directory).
+
+Manual installation:
+
+1. Create a folder named `Hidontknow` in your vault's `.obsidian/themes/` folder.
+2. Copy `theme.css` and `manifest.json` into it.
+3. Open **Settings → Appearance → Themes** and select **Hidontknow**.
+
+## Changing the accent color
+
+The accent color comes from `--accent-h/s/l`, and the theme sets separate defaults for light and dark mode. To use another color, add a CSS snippet:
 
 ```css
 .theme-light { --accent-h: 340; --accent-s: 75%; --accent-l: 55%; }
 .theme-dark  { --accent-h: 340; --accent-s: 70%; --accent-l: 65%; }
 ```
 
-暗色下 H2 胶囊用深色文字，所以暗色的 `--accent-l` 建议保持在 60% 以上。
+In dark mode the H2 pill uses dark text, so keep the dark `--accent-l` at 60% or higher.
 
-## 配套插件：Pele Mermaid（试验）
+## Companion plugin: Pele Mermaid (experimental)
 
-插件 [Pele Mermaid](https://github.com/hidontknow/obsidian-pele-mermaid) 用 [Pele](https://github.com/obsidianmd/pele) 代替内置的 mermaid.js 渲染 Mermaid 图。主题已为 Pele 的图适配亮色 / 暗色配色；不装插件时，Mermaid 图照常由 mermaid.js 渲染。
+The [Pele Mermaid](https://github.com/hidontknow/obsidian-pele-mermaid) plugin renders Mermaid diagrams with [Pele](https://github.com/obsidianmd/pele) instead of the built-in mermaid.js. The theme colors Pele diagrams for light and dark mode. Without the plugin, Mermaid diagrams are rendered by mermaid.js as usual.
 
-## 开发
+## Development
 
 ```bash
 npm install
 npm run lint
 ```
 
-## 致谢
+## Credits
 
-- [Blue Topaz](https://github.com/whyt-byte/Blue-Topaz_Obsidian-css)，MIT，© whyt-byte
-- [Phycat](https://github.com/sumruler/obsidian-theme-phycat)，MIT，© XuJilong
+- [Blue Topaz](https://github.com/whyt-byte/Blue-Topaz_Obsidian-css), MIT, © whyt-byte
+- [Phycat](https://github.com/sumruler/obsidian-theme-phycat), MIT, © XuJilong
 
-## 许可
+## License
 
-[MIT](LICENSE) © hidontknow。文件列表样式改编自 Phycat，文件列表图标来自 [Lucide](https://lucide.dev)（ISC），两者的许可声明附在 LICENSE 末尾。
+[MIT](LICENSE) © hidontknow. The file explorer styles are adapted from Phycat (MIT) and the file explorer icons come from [Lucide](https://lucide.dev) (ISC). See [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) for their licenses.
