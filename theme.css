@@ -195,12 +195,19 @@ body {
 	padding-top: var(--hd-block-gap);
 }
 
+/* 编辑模式正文的空格规则与阅读模式相同（pre-wrap）：折行处的空格挂在行外，长行在同一个词处换行。
+   代码块保持编辑器的 break-spaces，阅读模式代码已按它对齐 */
+.markdown-source-view.mod-cm6 .cm-line:not(.HyperMD-codeblock) {
+	white-space: pre-wrap;
+}
+
 /* ========== 列表与任务缩进（阅读 / 编辑模式一致） ========== */
 
 /* 实时预览按标记（"- "、"1. "、复选框）的实际宽度计算每行缩进，
    这里把标记统一成固定宽度，再让阅读模式第一层左边距与之相同；嵌套每层都是 --list-indent */
 body {
 	--hd-list-marker: round(1.625em, 1px); /* 编辑器按标记宽度向下取整算缩进，取整数像素才不丢小数 */
+	--list-indent: round(calc(var(--indent-unit) * var(--indent-size)), 1px); /* 嵌套缩进同理，保留「Tab 缩进宽度」设置的乘数 */
 }
 
 .markdown-source-view.mod-cm6.is-live-preview .HyperMD-list-line .cm-formatting-list {
@@ -208,9 +215,23 @@ body {
 	width: var(--hd-list-marker);
 }
 
-/* 圆点居中于标记区，与阅读模式的圆点位置一致 */
+/* 无序标记不能用 flex：flex 会丢掉只含空格的文字，空列表项的光标就没有位置。
+   改为行内块，空格靠右落在文字起点（光标在这里），圆点单独定位到文字左侧 0.8em，与阅读模式相同，不随 "-" "*" "+" 的字宽变化 */
+.markdown-source-view.mod-cm6.is-live-preview .HyperMD-list-line .cm-formatting-list-ul {
+	display: inline-block;
+	position: relative;
+	text-align: end;
+	white-space: pre;
+}
+
 .markdown-source-view.mod-cm6.is-live-preview .HyperMD-list-line .list-bullet {
-	margin-inline-start: -2px;
+	position: absolute;
+	inset-inline-start: calc(100% - 0.8em);
+	width: 0;
+}
+
+.markdown-source-view.mod-cm6.is-live-preview .HyperMD-list-line .list-bullet::after {
+	inset-inline-start: calc(-1 * var(--list-bullet-size) / 2);
 }
 
 /* 序号靠右，位数多时向左伸出，与阅读模式的列表序号一致；保留序号后的空格 */
@@ -226,7 +247,7 @@ body {
 .markdown-source-view.mod-cm6.is-live-preview .HyperMD-list-line .task-list-label {
 	display: inline-flex;
 	justify-content: flex-end;
-	width: calc(var(--hd-list-marker) + 0.25em - 0.275em); /* 0.25em 抵消 Obsidian 给标签的 -0.25em 外边距 */
+	width: calc(var(--hd-list-marker) + 0.25em - 0.275em + 0.5px); /* 0.25em 抵消 Obsidian 给标签的 -0.25em 外边距；空格宽按 0.275em 估算，多留 0.5px，编辑器向下取整算缩进时不会少 1px */
 }
 
 /* 阅读模式复选框默认左移 1.5 倍尺寸，只在尺寸 = 16px 时让文字落在列表文字位置；改为左移"尺寸 + 右外边距"，任何字号都对齐 */
@@ -427,6 +448,12 @@ body {
 /* 阅读模式代码没有缩进参考线，编辑模式代码块里也不画 */
 .markdown-source-view.mod-cm6 .HyperMD-codeblock .cm-indent::before {
 	display: none;
+}
+
+/* 列表缩进线：阅读模式画在子列表左边 0.85em 处，即标记宽度减 0.85em；编辑模式每层从缩进块起点推同样的距离 */
+.markdown-source-view.mod-cm6.is-live-preview .HyperMD-list-line .cm-indent::before {
+	margin-inline-start: calc(var(--hd-list-marker) + var(--indentation-guide-reading-indent));
+	width: 0;
 }
 
 /* 编辑模式的语言标签和阅读模式的复制按钮一样，悬停时才出现 */
