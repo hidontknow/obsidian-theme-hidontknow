@@ -12,21 +12,22 @@ Requires Obsidian 1.14.0 or later.
 
 This is the main feature of the theme. Switching between reading view and editing view (Live Preview) does not move or restyle your content: every line of text sits at the same position, with the same size, weight, color and background.
 
-- **What is aligned**: headings (including the H2 pill height), paragraph and block spacing, list and task indents, bullets and checkboxes, blockquotes (including nested ones and long wrapped lines), code blocks (frame, line height and highlight colors), tables, callouts, horizontal rules, images, embeds, math and the properties block.
+- **What is aligned**: headings (including the H2 pill height), paragraph and block spacing, list and task indents, bullets and checkboxes, blockquotes (including nested ones and long wrapped lines), code blocks (frame, font size, line height and indentation), tables, callouts, horizontal rules, images, embeds, math and the properties block.
 - **How it is checked**: a script measures both views of the same note element by element. Positions match to within 0.05px in light and dark mode, at font sizes 14–20 and tab indent sizes 2, 4 and 8. Clicking in the editor still places the cursor exactly where you click.
-- **What cannot match**: a few differences come from how Obsidian itself renders the two views, and CSS cannot change them:
-  - Lists inside blockquotes are not parsed as lists in the editor, so they show `- ` and lack list spacing.
-  - Code blocks nested in a list span the full width in the editor, because the list indent is part of the code text.
-  - Footnotes show as `[^1]` in the editor; reading view shows `[1]` and moves the footnote text to the end.
-  - `%%comments%%` are visible in the editor and hidden in reading view.
-  - Ordered lists are renumbered in reading view (a `10.` after `3.` becomes `4.`).
-  - A few code tokens are colored differently, because the two views use different highlighters (Prism and CodeMirror).
+- **Fixed by the support plugin**: a few differences come from how Obsidian's editor parses Markdown, and CSS cannot change them. The [Hidontknow Support](https://github.com/hidontknow/obsidian-theme-hidontknow-support) plugin fixes them in the editor:
+  - Lists inside blockquotes: bullets, numbers, checkboxes and list spacing.
+  - Code blocks nested in a list: indented to the list text, box included.
+  - Footnotes: `[^1]` shows as `[1]`, and definitions at the end of the note show as a footnote section.
+  - `%%comments%%`: hidden like in reading view.
+  - Ordered lists: renumbered like in reading view (a `10.` after `3.` becomes `4.`).
+  - Code highlighting: the editor is highlighted with reading view's Prism, so colors and styles match character by character. Without the plugin, the two views use different highlighters (Prism and CodeMirror) and keep Obsidian's default colors.
+- **What still cannot match**, even with the plugin:
+  - Footnote definitions in the middle of a note: reading view moves them to the end.
 
 ## Features
 
 - **Headings**: H1 is centered with a gradient underline that grows on hover. H2 is a gradient pill. H3 has a colored bar on the left. H4 uses the accent color. Long H2 headings stay one pill when they wrap.
 - **Text**: Bold text and inline code use the accent color. Blockquotes have a tinted background. Code blocks have an accent bar on the left. Tables have rounded corners and striped rows. Horizontal rules use a gradient.
-- **Code highlighting**: Reading view (Prism) and editing view (CodeMirror) use the same colors for keywords, strings, numbers, comments and attributes.
 - **File explorer**: Rounded rows, rainbow folders (top-level folders cycle through 7 colors) and thin indent guides. File icons show the file type: notes, images, PDF, audio, video, code, Office documents / spreadsheets / presentations, archives, Canvas, Base and Excalidraw. Files and folders line up.
 - **Other**: Tags are pills, external links have no trailing arrow icon, callouts have a colored bar on the left, and completed tasks are dimmed.
 - Respects the system "reduce motion" setting.

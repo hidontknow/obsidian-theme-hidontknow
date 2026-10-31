@@ -26,7 +26,6 @@ body {
 	--file-line-width: 46rem;
 	--callout-radius: var(--hd-radius);
 	--code-radius: var(--hd-radius);
-	--code-punctuation: var(--code-normal); /* 编辑器不给标点单独着色，阅读模式跟它一致 */
 	--blockquote-border-thickness: 4px;
 	--table-header-weight: 600;
 	--tag-radius: 999px;
@@ -183,7 +182,7 @@ body {
 	--p-spacing: 0px;
 }
 
-/* 阅读模式：块自身不留外边距，相邻块之间隔一个空行的高度 */
+/* 阅读模式：块自身不留外边距，相邻块之间隔一个空行的高度；用 ~ 而非 +，注释、脚注定义渲染出的空块不会吃掉间距 */
 .markdown-preview-view {
 	--heading-spacing: 0px;
 }
@@ -192,7 +191,7 @@ body {
 	margin-block: 0;
 }
 
-.markdown-preview-sizer > [class^="el-"] + [class^="el-"] {
+.markdown-preview-sizer > [class^="el-"] ~ [class^="el-"] {
 	padding-top: var(--hd-block-gap);
 }
 
@@ -404,101 +403,6 @@ body {
 	color: var(--color-accent);
 }
 
-/* 下面这组 token 映射靠先后顺序表达优先级（后写的更具体的覆盖前面的通用规则），不按特异性重排 */
-/* stylelint-disable no-descending-specificity */
-
-/* 代码高亮：阅读模式（Prism）和编辑模式（CodeMirror）切分 token 的方式不同，
-   统一映射到两边都能区分的几类颜色；函数名、类名、变量等编辑器分不出来的一律用正文色 */
-.markdown-rendered pre .token:is(.function, .class-name, .parameter, .variable, .property, .property-access, .constant, .operator, .selector, .combinator, .pseudo-class, .interpolation, .rule) {
-	color: var(--code-normal);
-}
-
-.markdown-rendered pre .token:is(.boolean, .null, .nil, .builtin, .important, .entity, .id, .hexcode, .symbol) {
-	color: var(--code-keyword);
-}
-
-.markdown-rendered pre .token:is(.regex, .regex-delimiter, .regex-source, .regex-flags, .interpolation-punctuation, .attr-value),
-.markdown-rendered pre .token.interpolation .token.delimiter {
-	color: var(--code-string);
-}
-
-.markdown-rendered pre .token.attr-value .token.punctuation {
-	color: var(--code-string);
-}
-
-.markdown-rendered pre .token.attr-value .token.attr-equals {
-	color: var(--code-normal);
-}
-
-/* bash 的命令名编辑器标为内置命令 */
-.markdown-rendered pre.language-bash .token.function {
-	color: var(--code-keyword);
-}
-
-.markdown-rendered pre .token.unit {
-	color: var(--code-value);
-}
-
-.markdown-rendered pre .token:is(.decorator, .annotation) {
-	color: var(--code-comment);
-}
-
-.markdown-rendered pre .token.attr-name,
-.markdown-rendered pre .token.parameter.variable {
-	color: var(--code-property);
-}
-
-/* 预处理指令、属性注解、diff 坐标行：编辑器整段标为 meta，阅读模式跟随用注释色 */
-.markdown-rendered pre:is(.language-c, .language-cpp) .token.macro,
-.markdown-rendered pre:is(.language-c, .language-cpp) .token.macro .token,
-.markdown-rendered pre .token:is(.attribute, .coord),
-.markdown-rendered pre .token.attribute .token {
-	color: var(--code-comment);
-}
-
-/* 以下按语言补齐：编辑器的标法与 Prism 不同，阅读模式向编辑器看齐 */
-.markdown-rendered pre.language-sql .token:is(.function, .operator),
-.markdown-rendered pre.language-yaml .token.key,
-.markdown-rendered pre.language-toml .token.table {
-	color: var(--code-keyword);
-}
-
-.markdown-rendered pre.language-php .token:is(.delimiter, .type-hint, .return-type),
-.markdown-rendered pre.language-yaml .token.null {
-	color: var(--code-normal);
-}
-
-.markdown-rendered pre.language-yaml .token.punctuation {
-	color: var(--code-comment);
-}
-
-.markdown-rendered pre.language-kotlin .token.interpolation,
-.markdown-rendered pre.language-kotlin .token.interpolation .token {
-	color: var(--code-string);
-}
-
-.markdown-rendered pre.language-ruby .token.class-name {
-	color: var(--code-tag);
-}
-
-/* stylelint-enable no-descending-specificity */
-
-.cm-s-obsidian span.cm-hmd-codeblock:is(.cm-def, .cm-variable, .cm-variable-2, .cm-variable-3, .cm-property, .cm-callee, .cm-qualifier, .cm-operator) {
-	color: var(--code-normal);
-}
-
-.cm-s-obsidian span.cm-hmd-codeblock:is(.cm-atom, .cm-builtin, .cm-type) {
-	color: var(--code-keyword);
-}
-
-.cm-s-obsidian span.cm-hmd-codeblock.cm-attribute {
-	color: var(--code-property);
-}
-
-.cm-s-obsidian span.cm-hmd-codeblock.cm-meta {
-	color: var(--code-comment);
-}
-
 /* 代码块：左侧强调色条 */
 .markdown-rendered pre {
 	border: 1px solid var(--background-modifier-border);
@@ -509,6 +413,7 @@ body {
 .markdown-source-view.mod-cm6 .HyperMD-codeblock-bg {
 	border-right: 1px solid var(--background-modifier-border);
 	border-left: 3px solid var(--color-accent);
+	padding-inline-end: var(--size-4-4); /* 右侧留白与阅读模式代码块相同，长行在同一处换行 */
 }
 
 .markdown-source-view.mod-cm6 .HyperMD-codeblock-begin-bg {
@@ -517,6 +422,11 @@ body {
 
 .markdown-source-view.mod-cm6 .HyperMD-codeblock-end-bg {
 	border-bottom: 1px solid var(--background-modifier-border);
+}
+
+/* 阅读模式代码没有缩进参考线，编辑模式代码块里也不画 */
+.markdown-source-view.mod-cm6 .HyperMD-codeblock .cm-indent::before {
+	display: none;
 }
 
 /* 编辑模式的语言标签和阅读模式的复制按钮一样，悬停时才出现 */
@@ -575,6 +485,19 @@ body {
 	margin-block: calc((var(--hd-block-gap) - 2px) / 2);
 }
 
+/* 列表项里的代码块与顶层代码块高度相同（配合辅助插件，编辑模式里它是普通代码块）；
+   编辑模式里它在列表文字那一行的下内边距之后，阅读模式同样下移、底部抵消 */
+.markdown-rendered li > pre {
+	margin-block: var(--list-spacing) calc(-1 * var(--list-spacing));
+	padding-block: var(--hd-code-line);
+}
+
+.markdown-rendered li > pre > code {
+	display: block;
+	white-space: break-spaces;
+	overflow-wrap: anywhere;
+}
+
 /* 阅读模式补齐编辑模式的块高度：代码块首尾各占一行代码高，表格组件上下留 --size-4-4（编辑器固定用它，不随字号变），分割线占满一行 */
 .markdown-preview-sizer > .el-pre > pre {
 	padding-block: var(--hd-code-line);
@@ -583,6 +506,8 @@ body {
 /* pre 是正文字号，code 是代码字号，同行基线对齐会把每行撑高；code 设为块级后行高只由它自己决定 */
 .markdown-preview-sizer > .el-pre > pre > code {
 	display: block;
+	white-space: break-spaces; /* 与编辑器相同：行尾空格也占位，长行在同一处换行 */
+	overflow-wrap: anywhere;
 }
 
 .markdown-preview-sizer > .el-table > table {
